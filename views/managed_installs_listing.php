@@ -12,7 +12,7 @@ new Managedinstalls_model;
   <div class="row">
 
   	<div class="col-lg-12">
-        
+
 	<h3><span data-i18n="managedinstalls.report"></span> <span id="total-count" class='label label-primary'>…</span></h3>
 
 	  <table class="table table-striped table-condensed table-bordered">
@@ -25,6 +25,7 @@ new Managedinstalls_model;
             <th data-i18n="displayname" data-colname='managedinstalls.display_name'></th>
             <th data-i18n="version" data-colname='managedinstalls.version'></th>
             <th data-i18n="status" data-colname='managedinstalls.status'></th>
+            <th data-i18n="listing.checkin" data-colname='reportdata.timestamp'></th>
             <th data-i18n="type" data-colname='managedinstalls.type'></th>
             <th data-i18n="size" data-colname='managedinstalls.size'></th>
 		  </tr>
@@ -52,7 +53,7 @@ new Managedinstalls_model;
 		oTable.ajax.reload();
 		return;
 
-	});		
+	});
 
 	$(document).on('appReady', function(e, lang) {
 
@@ -63,16 +64,16 @@ new Managedinstalls_model;
             columnDefs = [{ visible: false, targets: hideThese }], //Column Definitions
             pkgName = "<?=$name?>",
             pkgVersion = "<?=$version?>";
-        
+
         if(pkgName){
             // Set name on heading
             $('h3>span:first').text(pkgName);
-            
+
             if(pkgVersion){
                 $('h3>span:first').text(pkgName + ' ('+pkgVersion+')');
             }
         }
-        
+
 
 
         $('.table th').map(function(){
@@ -96,16 +97,16 @@ new Managedinstalls_model;
                 type: "POST",
                 data: function(d){
                     d.mrColNotEmpty = "managedinstalls.name";
-                    
+
                     d.where = [];
-                    
+
                     if(pkgName){
                         d.where.push({
                             table: 'managedinstalls',
                             column: 'name',
                             value: pkgName
                         });
-                        
+
                         if(pkgVersion){
                             d.where.push({
                                 table: 'managedinstalls',
@@ -132,7 +133,7 @@ new Managedinstalls_model;
                 } else {
                   $('td:eq(0)', nRow).html(name);
                 }
-                
+
                 var status = $('td:eq(5)', nRow).text();
                 if(mr.statusFormat[status]){
                     $('td:eq(5)', nRow).empty()
@@ -141,8 +142,14 @@ new Managedinstalls_model;
                             .addClass('label-' + mr.statusFormat[status].type)
                             .text(status));
                 }
-                
-                $('td:last', nRow).html(fileSize($('td:last', nRow).html() * 1024));    
+
+                // Format Check-In timestamp
+                var checkin = parseInt($('td:eq(6)', nRow).html());
+                var date = new Date(checkin * 1000);
+                $('td:eq(6)', nRow).html(moment(date).fromNow());
+
+                // Format filesize
+                $('td:last', nRow).html(fileSize($('td:last', nRow).html() * 1024));
 
             } //end fnCreatedRow
 
