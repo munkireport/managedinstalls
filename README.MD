@@ -1,7 +1,5 @@
 ## managedinstalls Module for Munkireport-PHP
 
-### Note:
-**pending_munki widget is now pending_munki**
 
 | Field         | Type             |
 |-----------------|--------------------|
