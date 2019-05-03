@@ -1,6 +1,6 @@
 <div class="col-lg-4 col-md-6">
 
-	<div class="panel panel-default" id="pending-installs-munki-widget">
+	<div class="panel panel-default" id="pending-munki-widget">
 
 		<div class="panel-heading" data-container="body" data-i18n="[title]managedinstalls.widget.pending_munki.tooltip">
 
@@ -24,7 +24,7 @@ $(document).on('appUpdate', function(e, lang) {
 
 	$.getJSON( appUrl + '/module/managedinstalls/get_pending_installs/munki', function( data ) {
 
-        var box = $('#pending-installs-munki-widget div.scroll-box').empty();
+        var box = $('#pending-munki-widget div.scroll-box').empty();
 
 		if(data.length){
 			$.each(data, function(i,d){
