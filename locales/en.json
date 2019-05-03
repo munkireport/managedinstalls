@@ -13,7 +13,7 @@
             "title": "Pending Apple Updates",
             "tooltip": "Pending Apple updates for this week"
         },
-        "pending_installs_munki": {
+        "pending_munki": {
             "title": "Pending Installs",
             "tooltip": "Pending installs for this week"
         },
