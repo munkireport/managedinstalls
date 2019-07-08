@@ -18,6 +18,10 @@ class managedinstalls_controller extends Module_controller
         // Store module path
         $this->module_path = dirname(__FILE__);
         $this->view_path = dirname(__FILE__) . '/views/';
+
+        if ($this->authorized()) {
+            $this->connectDB();
+        }
     }
 
       /**
@@ -31,10 +35,9 @@ class managedinstalls_controller extends Module_controller
         if (! $this->authorized()) {
             $out['error'] = 'Not authorized';
         } else {
-            $model = new Managedinstalls_model;
-            foreach ($model->retrieve_records($serial_number) as $prefs) {
-                $out[] = $prefs->rs;
-            }
+            $out = Managedinstalls_model::where('managedinstalls.serial_number', $serial_number)
+                ->filter()
+                ->get();
         }
 
         $obj = new View();
@@ -51,17 +54,11 @@ class managedinstalls_controller extends Module_controller
      **/
     public function get_pending_installs($type = "munki")
     {
-        $out = array();
+        $out = [];
         if (! $this->authorized()) {
             $out['error'] = 'Not authorized';
         } else {
-            $model = new Managedinstalls_model;
-            $hoursBack = 24 * 7; // Hours back
-            $out = array();
-
-            foreach ($model->get_pending_installs($type, $hoursBack) as $obj) {
-                $out[] = $obj;
-            }
+            $out = $this->get_pending_items('pending_install', $type);       
         }
 
         $obj = new View();
@@ -78,21 +75,40 @@ class managedinstalls_controller extends Module_controller
      **/
     public function get_pending_removals($type = "munki")
     {
-        $out = array();
+        $out = [];
         if (! $this->authorized()) {
             $out['error'] = 'Not authorized';
         } else {
-            $model = new Managedinstalls_model;
-            $hoursBack = 24 * 7; // Hours back
-            $out = array();
-
-            foreach ($model->get_pending_removals($type, $hoursBack) as $obj) {
-                $out[] = $obj;
-            }
+            $out = $this->get_pending_items('pending_removal', $type);       
         }
 
         $obj = new View();
         $obj->view('json', array('msg' => $out));
+    }
+
+    // ------------------------------------------------------------------------
+
+        /**
+     * Get pending items
+     *
+     *
+     * @param string $status Type, pending_removal or pending_install
+     * @param string $type Type, munki or apple
+     **/
+    private function get_pending_items($status, $type)
+    {     
+        $hoursBack = 24 * 7; // Hours back
+        $fromdate = time() - 3600 * $hoursBack;
+
+        $query = Managedinstalls_model::selectRaw('name, version, display_name, COUNT(*) as count')
+            ->where('status', $status)
+            ->where('reportdata.timestamp', '>', $fromdate)
+            ->where('type', $type)
+            ->filter()
+            ->groupBy('name', 'display_name', 'version')
+            ->orderBy('count', 'desc');
+
+        return $query->get()->toArray();        
     }
 
     // ------------------------------------------------------------------------
@@ -111,25 +127,34 @@ class managedinstalls_controller extends Module_controller
         if (! $this->authorized()) {
             $out['error'] = 'Not authorized';
         } else {
-            $model = new Managedinstalls_model;
+
+
+            $query = Managedinstalls_model::selectRaw('name, version, display_name, status, COUNT(*) as count')
+                ->filter()
+                ->groupBy('status', 'name', 'display_name', 'version')
+                ->orderBy('version', 'desc');
+
+                if ($pkg) {
+                $query = $query->where('name', '=', $pkg);
+            }
 
             // Convert to list
-            foreach ($model->get_pkg_stats($pkg) as $rs) {
-                $status = $rs->status == 'install_succeeded' ? 'installed' : $rs->status;
-                $key = $rs->name . $rs->version;
+            foreach ($query->get()->toArray() as $rs) {
+                $status = $rs['status'] == 'install_succeeded' ? 'installed' : $rs['status'];
+                $key = $rs['name'] . $rs['version'];
                 if (isset($out[$key])) {
                     if (isset($out[$key][$status])) {
                         // $key exists, add count
-                        $out[$key][$status] += $rs->count;
+                        $out[$key][$status] += $rs['count'];
                     } else {
-                        $out[$key][$status] = $rs->count;
+                        $out[$key][$status] = $rs['count'];
                     }
                 } else {
                     $out[$key] = array(
-                        'name' => $rs->name,
-                        'version' => $rs->version,
-                        'display_name' => $rs->display_name,
-                        $status => $rs->count,
+                        'name' => $rs['name'],
+                        'version' => $rs['version'],
+                        'display_name' => $rs['display_name'],
+                        $status => $rs['count'],
                     );
                 }
             }
@@ -154,10 +179,21 @@ class managedinstalls_controller extends Module_controller
         if (! $this->authorized()) {
             $out['error'] = 'Not authorized';
         } else {
-            $model = new Managedinstalls_model;
-            foreach ($model->get_stats($hours) as $rs) {
-                $out[] = $rs;
+
+            if ($hours > 0) {
+                $timestamp = time() - 60 * 60 * $hours;
+            } else {
+                $timestamp = 0;
             }
+
+            $query = Managedinstalls_model::selectRaw('managedinstalls.status, type, count(distinct reportdata.serial_number) as clients, count(managedinstalls.status) as total_items')
+                ->join('machine', 'machine.serial_number', '=', 'managedinstalls.serial_number')    
+                ->where('reportdata.timestamp', '>', $timestamp)
+                ->whereNotNull('managedinstalls.type')
+                ->filter()
+                ->groupBy('status', 'type');
+            $out = $query->get()->toArray();     
+
         }
 
         $obj = new View();
@@ -207,14 +243,18 @@ class managedinstalls_controller extends Module_controller
      **/
     public function get_clients($status = 'pending_install', $hours = 24)
     {
-        $out = array();
+        $out = [];
         if (! $this->authorized()) {
             $out['error'] = 'Not authorized';
         } else {
-            $model = new Managedinstalls_model;
-            foreach ($model->get_clients($status, $hours) as $rs) {
-                $out[] = $rs;
-            }
+            $timestamp = time() - 60 * 60 * $hours;
+            $query = Managedinstalls_model::selectRaw('computer_name, machine.serial_number, COUNT(*) as count')
+                ->join('machine', 'machine.serial_number', '=', 'managedinstalls.serial_number')    
+                -> where('status', $status)
+                ->filter()
+                ->groupBy('machine.serial_number', 'computer_name')
+                ->orderBy('count', 'desc');
+            $out = $query->get()->toArray();        
         }
 
         $obj = new View();
