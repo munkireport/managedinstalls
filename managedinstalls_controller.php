@@ -18,10 +18,6 @@ class managedinstalls_controller extends Module_controller
         // Store module path
         $this->module_path = dirname(__FILE__);
         $this->view_path = dirname(__FILE__) . '/views/';
-
-        if ($this->authorized()) {
-            $this->connectDB();
-        }
     }
 
       /**
