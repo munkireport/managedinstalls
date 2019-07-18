@@ -85,43 +85,6 @@ class Managedinstalls_processor extends Processor
             $save_array
         );
 
-        return;
-
-        $modelData = ['serial_number' => $this->serial_number];
-        
-
-        // Translate plist keys to db keys
-        $translate = [
-            'ManagedInstallVersion' => 'version',
-            'ManifestName' => 'manifestname',
-            'RunType' => 'runtype',
-            'StartTime' => 'starttime',
-            'EndTime' => 'endtime',
-        ];
-
-        foreach ($translate as $key => $dbkey) {
-            if (array_key_exists($key, $mylist)) {
-                $modelData[$dbkey] = $mylist[$key];
-            }
-        }
-
-        // Parse errors and warnings
-        $errorsWarnings = ['Errors' => 'error_json', 'Warnings' => 'warning_json'];
-        foreach ($errorsWarnings as $key => $json) {
-            $dbkey = strtolower($key);
-            if (isset($mylist[$key]) && is_array($mylist[$key])) {
-                // Store count
-                $modelData[$dbkey] = count($mylist[$key]);
-
-                // Store json
-                $modelData[$json] = json_encode($mylist[$key]);
-            } else {
-                // reset
-                $modelData[$dbkey] = 0;
-                $modelData[$json] = json_encode([]);
-            }
-        }
-        
         $this->_storeEvents($new_installs, $uninstalls);
 
         return $this;
