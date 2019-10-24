@@ -81,7 +81,7 @@ class Managedinstalls_processor extends Processor
             }
         }
 
-        $model = Managedinstalls_model::insert(
+        $model = Managedinstalls_model::insertChunked(
             $save_array
         );
 
