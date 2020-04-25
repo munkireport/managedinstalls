@@ -50,15 +50,7 @@ class managedinstalls_controller extends Module_controller
      **/
     public function get_pending_installs($type = "munki")
     {
-        $out = [];
-        if (! $this->authorized()) {
-            $out['error'] = 'Not authorized';
-        } else {
-            $out = $this->get_pending_items('pending_install', $type);       
-        }
-
-        $obj = new View();
-        $obj->view('json', array('msg' => $out));
+        jsonView($this->get_pending_items('pending_install', $type));
     }
 
     // ------------------------------------------------------------------------
@@ -71,15 +63,7 @@ class managedinstalls_controller extends Module_controller
      **/
     public function get_pending_removals($type = "munki")
     {
-        $out = [];
-        if (! $this->authorized()) {
-            $out['error'] = 'Not authorized';
-        } else {
-            $out = $this->get_pending_items('pending_removal', $type);       
-        }
-
-        $obj = new View();
-        $obj->view('json', array('msg' => $out));
+        jsonView($this->get_pending_items('pending_removal', $type));
     }
 
     // ------------------------------------------------------------------------
@@ -97,7 +81,7 @@ class managedinstalls_controller extends Module_controller
         $fromdate = time() - 3600 * $hoursBack;
 
         $query = Managedinstalls_model::selectRaw('name, version, display_name, COUNT(*) as count')
-            ->where('status', $status)
+            ->where('managedinstalls.status', $status)
             ->where('reportdata.timestamp', '>', $fromdate)
             ->where('type', $type)
             ->filter()
@@ -125,9 +109,9 @@ class managedinstalls_controller extends Module_controller
         } else {
 
 
-            $query = Managedinstalls_model::selectRaw('name, version, display_name, status, COUNT(*) as count')
+            $query = Managedinstalls_model::selectRaw('name, version, display_name, managedinstalls.status, COUNT(*) as count')
                 ->filter()
-                ->groupBy('status', 'name', 'display_name', 'version')
+                ->groupBy('managedinstalls.status', 'name', 'display_name', 'version')
                 ->orderBy('version', 'desc');
 
                 if ($pkg) {
@@ -187,7 +171,7 @@ class managedinstalls_controller extends Module_controller
                 ->where('reportdata.timestamp', '>', $timestamp)
                 ->whereNotNull('managedinstalls.type')
                 ->filter()
-                ->groupBy('status', 'type');
+                ->groupBy('managedinstalls.status', 'type');
             $out = $query->get()->toArray();     
 
         }
@@ -246,7 +230,7 @@ class managedinstalls_controller extends Module_controller
             $timestamp = time() - 60 * 60 * $hours;
             $query = Managedinstalls_model::selectRaw('computer_name, machine.serial_number, COUNT(*) as count')
                 ->join('machine', 'machine.serial_number', '=', 'managedinstalls.serial_number')    
-                -> where('status', $status)
+                -> where('managedinstalls.status', $status)
                 ->filter()
                 ->groupBy('machine.serial_number', 'computer_name')
                 ->orderBy('count', 'desc');
