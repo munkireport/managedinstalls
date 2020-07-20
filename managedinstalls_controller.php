@@ -193,8 +193,8 @@ class managedinstalls_controller extends Module_controller
         if (! $this->authorized()) {
             redirect('auth/login');
         }
-        $data['name'] = rawurldecode($name);
-        $data['version'] = rawurldecode($version);
+        $data['name'] = addslashes($name);
+        $data['version'] = addslashes($version);
         $data['page'] = 'clients';
         $data['scripts'] = array("clients/client_list.js");
         $obj = new View();

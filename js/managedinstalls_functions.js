@@ -7,15 +7,15 @@ var managedInstallsVariables = {
 // Init function
 var initializeManagedInstalls = function(pkgName, pkgVersion){
     // Save the variables to the global space so the filter can use them
-    managedInstallsVariables.pkgName = pkgName;
-    managedInstallsVariables.pkgVersion = pkgVersion;
+    managedInstallsVariables.pkgName = decodeURIComponent(pkgName);
+    managedInstallsVariables.pkgVersion = decodeURIComponent(pkgVersion);
     if(pkgName){
         // Set name on heading
-        $('h3>span:first').text(pkgName);
+        $('h3>span:first').text(managedInstallsVariables.pkgName);
 
         if(pkgVersion){
             // Add version to heading
-            $('h3>span:first').text(pkgName + ' ('+pkgVersion+')');
+            $('h3>span:first').text(managedInstallsVariables.pkgName + ' ('+managedInstallsVariables.pkgVersion+')');
         }
     }
 }
