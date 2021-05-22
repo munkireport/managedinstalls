@@ -1,10 +1,9 @@
 <div class="col-lg-4 col-md-6">
-    <div class="panel panel-default" id="failing-widget">
-        <div class="panel-heading">
-            <h3 class="panel-title"><i class="fa fa-warning"></i>
-                <span data-i18n="managedinstalls.failing_clients"></span>
-                <list-link data-url="/show/listing/reportdata/clients"></list-link>
-            </h3>
+    <div class="card" id="failing-widget">
+        <div class="card-header">
+            <i class="fa fa-warning"></i>
+            <span data-i18n="managedinstalls.failing_clients"></span>
+            <a href="/show/listing/reportdata/clients" class="pull-right"><i class="fa fa-list"></i></a>
         </div>
         <div class="list-group scroll-box"></div>
     </div><!-- /panel -->
