@@ -1,20 +1,12 @@
 <div class="col-lg-4 col-md-6">
-
-    <div class="panel panel-default" id="pending-apple-widget">
-
-		<div class="panel-heading" data-container="body" data-i18n="[title]managedinstalls.widget.pending_apple.tooltip">
-
-			<h3 class="panel-title"><i class="fa fa-apple"></i>
-			    <span data-i18n="managedinstalls.widget.pending_apple.title"></span>
-			    <list-link data-url="/module/managedinstalls/listing/#pending_install"></list-link>
-			</h3>
-
+    <div class="card" id="pending-apple-widget">
+		<div class="card-header" data-container="body" data-i18n="[title]managedinstalls.widget.pending_apple.tooltip">
+			<i class="fa fa-apple"></i>
+            <span data-i18n="managedinstalls.widget.pending_apple.title"></span>
+            <a href="/module/managedinstalls/listing/#pending_install" class="pull-right text-reset"><i class="fa fa-list"></i></a>
 		</div>
-
 		<div class="list-group scroll-box"></div>
-
-	</div><!-- /panel -->
-
+	</div>
 </div><!-- /col -->
 
 <script>
@@ -28,7 +20,7 @@ $(document).on('appUpdate', function(e, lang) {
 
 		if(data.length){
 			$.each(data, function(i,d){
-				var badge = '<span class="badge pull-right">'+d.count+'</span>',
+				var badge = '<span class="badge badge-light pull-right">'+d.count+'</span>',
                     url = appUrl+'/module/managedinstalls/listing/'+d.name+'#pending_install',
                     display_name = d.display_name || d.name;
 

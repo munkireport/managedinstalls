@@ -1,20 +1,12 @@
 <div class="col-lg-4 col-md-6">
-
-	<div class="panel panel-default" id="pending-removals-munki-widget">
-
-		<div class="panel-heading" data-container="body" data-i18n="[title]managedinstalls.widget.pending_removals_munki.tooltip">
-
-			<h3 class="panel-title"><i class="fa fa-shopping-cart"></i>
-			    <span data-i18n="managedinstalls.widget.pending_removals_munki.title"></span>
-			    <list-link data-url="/module/managedinstalls/listing/#pending_removal"></list-link>
-			</h3>
-
+	<div class="card" id="pending-removals-munki-widget">
+		<div class="card-header" data-container="body" data-i18n="[title]managedinstalls.widget.pending_removals_munki.tooltip">
+			<i class="fa fa-shopping-cart"></i>
+            <span data-i18n="managedinstalls.widget.pending_removals_munki.title"></span>
+            <a href="/module/managedinstalls/listing/#pending_removal" class="pull-right"><i class="fa fa-list"></i></a>
 		</div>
-
 		<div class="list-group scroll-box"></div>
-
 	</div><!-- /panel -->
-
 </div><!-- /col -->
 
 <script>
