@@ -1,29 +1,11 @@
 <?php
-/**
- * Managedinstalls Processor
- * 
- * Processes managed install data from Munki clients.
- * Supports both plist and YAML data formats for future compatibility.
- * 
- * @package munkireport/managedinstalls
- */
 
 use CFPropertyList\CFPropertyList;
 use munkireport\processors\Processor;
 
-// Include the DataParser for YAML support
-require_once __DIR__ . '/lib/DataParser.php';
-use munkireport\managedinstalls\lib\DataParser;
-
 class Managedinstalls_processor extends Processor
 {
-<<<<<<< HEAD
-    private $timestamp;
-
-    public function run($plist)
-=======
     public function run($data)
->>>>>>> c05ea67 (Add YAML support alongside XML parsing)
     {
         $this->timestamp = date('Y-m-d H:i:s');
 
@@ -33,8 +15,18 @@ class Managedinstalls_processor extends Processor
             );
         }
 
-        // Use DataParser to handle both plist and YAML formats
-        $mylist = DataParser::parse($data);
+        // Parse plist or YAML data
+        $trimmedData = ltrim($data);
+        if (strpos($trimmedData, '<?xml') === 0 ||
+            strpos($trimmedData, '<!DOCTYPE plist') !== false ||
+            strpos($trimmedData, '<plist') !== false) {
+            $parser = new CFPropertyList();
+            $parser->parse($data, CFPropertyList::FORMAT_XML);
+            $mylist = $parser->toArray();
+        } else {
+            $mylist = \Symfony\Component\Yaml\Yaml::parse($data);
+        }
+
         if (! $mylist) {
             return;
         }

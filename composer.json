@@ -1,14 +1,5 @@
 {
     "name": "munkireport/managedinstalls",
-    "description": "Module for munkireport with YAML support.",
-    "license": "MIT",
-    "version": "6.1.0",
-    "suggest": {
-        "symfony/yaml": "For enhanced YAML parsing support (^5.0 || ^6.0 || ^7.0)"
-    },
-    "autoload": {
-        "psr-4": {
-            "munkireport\\managedinstalls\\": ""
-        }
-    }
+    "description": "Module for munkireport.",
+    "license": "MIT"
 }
