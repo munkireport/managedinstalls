@@ -5,6 +5,8 @@ use munkireport\processors\Processor;
 
 class Managedinstalls_processor extends Processor
 {
+    public $timestamp;
+    
     public function run($data)
     {
         $this->timestamp = date('Y-m-d H:i:s');
