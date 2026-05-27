@@ -22,7 +22,7 @@ default_install_dir = '/Library/Managed Installs'
 managed_install_dir = CoreFoundation.CFPreferencesCopyAppValue("ManagedInstallDir", "ManagedInstalls")
 
 # Checks munki preferences to see where the ManagedSoftwareUpdate.log (and Install.log) is set
-log_file = CoreFoundation.CFPreferencesCopyAppValue( "ManagedInstallDir", "LogFile")
+log_file = CoreFoundation.CFPreferencesCopyAppValue( "LogFile", "ManagedInstalls")
 
 # set the paths based on munki's configuration.
 if managed_install_dir:
